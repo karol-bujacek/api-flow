@@ -4,5 +4,6 @@ public enum CaseState {
     CREATED,
     WORKING,
     FINISHED,
-    ERROR
+    ERROR,
+    FATAL
 }

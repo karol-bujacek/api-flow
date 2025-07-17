@@ -30,6 +30,7 @@ public class MetricsController {
         metricsWorker(flowCounter.getFlowTotal(), "api_flow_total_sum", sb);
         metricsWorker(flowCounter.getFlowOk(), "api_flow_ok_sum", sb);
         metricsWorker(flowCounter.getFlowError(), "api_flow_error_sum", sb);
+        metricsWorker(flowCounter.getFlowFatal(), "api_flow_fatal_sum", sb);
         return sb.toString();
     }
 

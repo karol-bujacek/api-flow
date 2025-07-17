@@ -11,6 +11,7 @@ public class FlowCounter {
     private final Map<String, Integer> flowTotal = new HashMap<>();
     private final Map<String, Integer> flowOk = new HashMap<>();
     private final Map<String, Integer> flowError = new HashMap<>();
+    private final Map<String, Integer> flowFatal = new HashMap<>();
 
     public void incrementFlowTotal(String flow) {
         flowTotal.merge(flow, 1, Integer::sum);
@@ -24,6 +25,10 @@ public class FlowCounter {
         flowError.merge(flow, 1, Integer::sum);
     }
 
+    public void incrementFlowFatal(String flow) {
+        flowFatal.merge(flow, 1, Integer::sum);
+    }
+
     public Map<String, Integer> getFlowTotal() {
         return flowTotal;
     }
@@ -34,5 +39,9 @@ public class FlowCounter {
 
     public Map<String, Integer> getFlowError() {
         return flowError;
+    }
+
+    public Map<String, Integer> getFlowFatal() {
+        return flowFatal;
     }
 }

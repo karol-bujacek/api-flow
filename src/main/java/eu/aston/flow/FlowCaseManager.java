@@ -181,7 +181,7 @@ public class FlowCaseManager {
 
     public void taskTimeout(String taskId) {
         try{
-            finishTask(taskId, 408, "timeout");
+            finishTask(taskId, 504, "timeout");
         }catch (UserException ignore){
         }
     }
@@ -194,6 +194,13 @@ public class FlowCaseManager {
         List<FlowTaskEntity> tasks = taskStore.selectTaskByCaseId(flowCase.getId());
 
         LOGGER.info("nextTick {}/{} {}", flowCase.getCaseType(), flowCase.getId(), flowCase.getStep());
+
+        if(tasks.stream().anyMatch(t->t.getResponseCode()>=500)){
+            //fatal error, koncim
+            flowCase.setState(CaseState.FATAL);
+            finishFlow(flowCase, flowDef, tasks);
+            return;
+        }
 
         String aktStepCode = openTasks(flowDef, flowCase, tasks);
         if(aktStepCode!=null){
@@ -334,14 +341,20 @@ public class FlowCaseManager {
         if(finishTask!=null && finishTask.getError()!=null){
             flowCaseEntity.setState(CaseState.ERROR);
         }
+        if(tasks.stream().anyMatch(t -> t.getResponseCode() >= 500)){
+            flowCaseEntity.setState(CaseState.FATAL);
+        }
+
         caseStore.finishFlow(flowCaseEntity.getId(), flowCaseEntity.getState(), flowCaseEntity.getStep(), flowCaseEntity.getResponse());
         LOGGER.info("finish flow {}/{} {}", flowCaseEntity.getCaseType(), flowCaseEntity.getId(), flowCaseEntity.getState());
         spanSender.finishFlow(flowCaseEntity, flowDef, null);
 
         if(Objects.equals(flowCaseEntity.getState(), CaseState.FINISHED)){
             flowCounter.incrementFlowOk(flowCaseEntity.getCaseType());
-        } else {
+        } else if(Objects.equals(flowCaseEntity.getState(), CaseState.ERROR)) {
             flowCounter.incrementFlowError(flowCaseEntity.getCaseType());
+        } else {
+            flowCounter.incrementFlowFatal(flowCaseEntity.getCaseType());
         }
 
         //save to blob and clean db

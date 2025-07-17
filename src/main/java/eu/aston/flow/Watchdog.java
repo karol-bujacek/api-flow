@@ -35,7 +35,7 @@ public class Watchdog {
         List<String> expiredTasks = flowCaseManager.getTaskStore().selectExpired();
         for (String id : expiredTasks){
             LOGGER.info("watchdog timeout task {}", id);
-            flowCaseManager.finishTask(id, 408, "timeout-watchdog");
+            flowCaseManager.finishTask(id, 504, "timeout-watchdog");
         }
     }
 
