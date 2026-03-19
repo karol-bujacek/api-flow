@@ -195,7 +195,7 @@ public class FlowCaseManager {
 
         LOGGER.info("nextTick {}/{} {}", flowCase.getCaseType(), flowCase.getId(), flowCase.getStep());
 
-        if(tasks.stream().anyMatch(t->t.getResponseCode()>=500)){
+        if(tasks.stream().anyMatch(t-> t.getResponseCode()!=null && t.getResponseCode()>=500)){
             //fatal error, koncim
             flowCase.setState(CaseState.FATAL);
             finishFlow(flowCase, flowDef, tasks);
